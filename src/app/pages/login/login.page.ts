@@ -1,8 +1,11 @@
+import { AngularFirestore } from '@angular/fire/firestore';
+import { Subscription } from 'rxjs';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { IonSlides, LoadingController, ToastController } from '@ionic/angular';
 import { User } from 'src/app/interfaces/user';
 import { AuthService } from 'src/app/services/auth.service';
 import { Keyboard } from '@ionic-native/keyboard/ngx';
+import { AngularFireAuth } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-login',
@@ -16,15 +19,22 @@ export class LoginPage implements OnInit {
   public userLogin: User = {};
   public userRegister: User = {};
   private loading: any;
+  private userSubscription: Subscription;
 
   constructor(
     private authService: AuthService,
     private loadingCtrl: LoadingController,
     private toastCtrl: ToastController,
-    public keyboard: Keyboard
+    public keyboard: Keyboard,
+    public afs: AngularFirestore,
+    public auth: AngularFireAuth
   ) { }
 
   ngOnInit() { }
+  
+  ngOnDestroy(){
+    if(this.userSubscription) this.userSubscription.unsubscribe();
+  }
 
   segmentChanged(event: any) {
     if (event.detail.value === 'login') {
@@ -41,11 +51,20 @@ export class LoginPage implements OnInit {
 
     try {
       await this.authService.login(this.userLogin);
+      this.loadUser();
     } catch (error) {
       this.presentToast(error.message);
     } finally {
       this.loading.dismiss();
     }
+  }
+
+  loadUser(){
+    this.userSubscription = this.afs.collection('Users').doc(this.auth.auth.currentUser.uid).valueChanges().subscribe(
+      data => {
+        if(data) this.userLogin = data;
+      }
+    )
   }
 
   async register() {

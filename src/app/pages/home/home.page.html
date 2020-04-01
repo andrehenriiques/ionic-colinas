@@ -1,6 +1,6 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Surf Shop</ion-title>
+    <ion-title>Produtos Alumínio</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -41,7 +41,7 @@
       </ion-item>
 
       <ion-item-options side="end">
-        <ion-item-option color="danger" (click)="deleteProduct(product.id)">
+        <ion-item-option color="danger" *ngIf="master" (click)="deleteProduct(product.id)">
           <ion-icon slot="top" name="trash"></ion-icon>
           Excluir
         </ion-item-option>
@@ -60,8 +60,9 @@
           </ion-button>
         </ion-col>
 
-        <ion-col size="6">
-          <ion-button routerLink="/details" expand="block">
+        <ion-col size="6" *ngIf="master">
+          <ion-button routerLink="/details" expand="block"
+          >
             Add produto
           </ion-button>
         </ion-col>

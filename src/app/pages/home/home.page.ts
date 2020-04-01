@@ -4,6 +4,7 @@ import { LoadingController, ToastController } from '@ionic/angular';
 import { ProductService } from 'src/app/services/product.service';
 import { Product } from 'src/app/interfaces/product';
 import { Subscription } from 'rxjs';
+import { AngularFireAuth } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-home',
@@ -14,10 +15,13 @@ export class HomePage implements OnInit {
   private loading: any;
   public products = new Array<Product>();
   private productsSubscription: Subscription;
+  public user :any[];
+  public master: boolean;
 
   constructor(
     private authService: AuthService,
     private loadingCtrl: LoadingController,
+    private auth: AngularFireAuth,
     private productService: ProductService,
     private toastCtrl: ToastController
   ) {
@@ -26,7 +30,18 @@ export class HomePage implements OnInit {
     });
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+    this.master=false;
+    this.auth.user.subscribe(
+      use =>{
+        console.log(use.email)
+        console.log(this.master)
+        if(use.email == "geraldobaracho1@hotmail.com"){
+          this.master = true;
+        }
+      }
+    )
+   }
 
   ngOnDestroy() {
     this.productsSubscription.unsubscribe();
